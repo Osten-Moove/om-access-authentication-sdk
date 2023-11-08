@@ -44,14 +44,13 @@ export class LoginService {
     return [saveEntities, null]
   }
 
-  /* async remove(loginIds: Array<string>): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
+  async remove(loginIds: Array<string>): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
     const logins = await this.repository.find({ where: { id: In(loginIds) } })
     if (logins.length !== loginIds.length) return [null, ErrorCode.LOGIN_NOT_FOUND]
 
     const removeEntities = await this.repository.remove(logins)
     return [removeEntities, null]
   }
- */
 
   async definedPassword(loginId: string, password: string) {
     const loginEntity = await this.repository.findOne({ where: { id: loginId } })
