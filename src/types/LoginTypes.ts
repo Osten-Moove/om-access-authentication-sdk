@@ -5,6 +5,7 @@ export type CreateLogin = {
   id?: string
   login: string
   password?: string
+  isActive: boolean
   user: {
     email: string
     fullName: string
@@ -12,6 +13,19 @@ export type CreateLogin = {
 }
 
 export type CreateLogins = Array<CreateLogin>
+
+export type UpdateLogin = {
+  id?: string
+  login: string
+  isActive?: boolean
+  user: {
+    id?: string
+    email: string
+    fullName: string
+  }
+}
+
+export type UpdateLogins = Array<UpdateLogin>
 
 export type GenerateJwtWithPinOptions = {
   pinLength?: number
