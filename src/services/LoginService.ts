@@ -38,7 +38,7 @@ export class LoginService {
       const newData = data.find((data) => data.id === it.id)
       newData.user = Object.assign(it.user, newData.user)
       return Object.assign(it, newData)
-    });
+    })
 
     const saveEntities = await this.repository.save(loginsToUpdateNewData)
     return [saveEntities, null]
