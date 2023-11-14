@@ -25,7 +25,7 @@ export class AuthenticationService {
   private getLoginForGenerateToken(loginId: string) {
     return this.repository.findOne({
       where: { id: loginId },
-      select: { id: true, passwordToken: true, validationToken: true },
+      select: { id: true, passwordToken: true, validationToken: true, roles: true },
     })
   }
 
@@ -42,12 +42,12 @@ export class AuthenticationService {
   }
 
   async generateTemporaryJWT(id: string, type: string, options?: GenerateJwtWithPinOptions) {
-    const login = await this.getLoginForGenerateToken(id)
     const _options: GenerateJwtWithPinOptions = Object.assign(
       { pinLength: 6, expiresIn: '10m' } as GenerateJwtWithPinOptions,
       options,
     )
     const pin = generateNumberString(_options.pinLength)
+    const login = await this.getLoginForGenerateToken(id)
     const pinHash = bcrypt.hashSync(pin, 10)
     const payload: Partial<JWTTemporaryPayloadDTO> = { id, type, pin: pinHash, ...login }
 
@@ -72,20 +72,27 @@ export class AuthenticationService {
     login: string,
     password: string,
     options: { agent: string; ipAddress: string },
+    role: string,
   ): Promise<[LoginEntity, ErrorCode | undefined]> {
-    const loginEntity = await this.repository.findOneBy({ login })
-    if (!loginEntity) return [null, ErrorCode.LOGIN_NOT_FOUND]
+    try {
+      const loginEntity = await this.repository.findOneBy({
+        login,
+      })
+      if (!loginEntity) return [null, ErrorCode.LOGIN_NOT_FOUND]
+      if (role && !loginEntity.roles.includes(role)) return [null, ErrorCode.LOGIN_ROLE_INVALID]
+      const validPassword = bcrypt.compareSync(password, loginEntity.password)
+      if (!validPassword) return [null, ErrorCode.PASSWORD_INVALID]
 
-    const validPassword = bcrypt.compareSync(password, loginEntity.password)
-    if (!validPassword) return [null, ErrorCode.PASSWORD_INVALID]
+      this.loginLogService.create({
+        ...options,
+        loginId: loginEntity.id,
+        eventCode: 'LOGIN_SUCCESS',
+        eventMessage: 'Login successfully',
+      })
 
-    this.loginLogService.create({
-      ...options,
-      loginId: loginEntity.id,
-      eventCode: 'LOGIN_SUCCESS',
-      eventMessage: 'Login successfully',
-    })
-
-    return [loginEntity, null]
+      return [loginEntity, null]
+    } catch (error) {
+      return [null, error]
+    }
   }
 }

@@ -12,8 +12,7 @@ export class LoginLogService {
   }
 
   async create(log: { agent: string; loginId: string; ipAddress: string; eventCode: string; eventMessage: string }) {
-    const loginLog = this.repository.create(log)
-    await this.repository.insert(loginLog)
+    return this.repository.insert(this.repository.create(log))
   }
 
   async find(options?: FindManyOptions<LoginLogEntity>): Promise<LoginLogEntity[]> {

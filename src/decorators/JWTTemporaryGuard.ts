@@ -92,7 +92,6 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
         throw Error('Invalid validation token')
       if (loginEntity.passwordToken !== request.processedTemporaryPayloadDTO.passwordToken)
         throw Error('Invalid password token')
-
       return true
     } catch (error) {
       throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })

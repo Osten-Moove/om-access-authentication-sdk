@@ -19,19 +19,20 @@ import { RequestAuthorization } from '../types/LoginTypes'
 
 const metadataKey = AuthorizationLibDefaultOwner + 'JWT_GUARD'
 
-export const JWTGuard = (step: 'ACCESS' | 'REFRESH' = 'ACCESS') => SetMetadata(metadataKey, { step })
+export const JWTGuard = (roles: Array<string> = null, step: 'ACCESS' | 'REFRESH' = 'ACCESS') =>
+  SetMetadata(metadataKey, { step, roles })
 
 @Injectable()
 export class AuthenticationJWTGuard implements CanActivate {
-  private secondarySecret: string
+  private secret: string
   private repository: Repository<LoginEntity>
   constructor(private reflector: Reflector, @Inject(JwtService) private readonly jwtService: JwtService) {
-    this.secondarySecret = AuthenticationModule.config.secondarySecret
+    this.secret = AuthenticationModule.config.secret
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
   }
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const params = this.reflector.getAllAndOverride<{ step: string; secret: 'PRIMARY' | 'SECONDARY' }>(metadataKey, [
+    const params = this.reflector.getAllAndOverride<{ step: string; roles: Array<string> }>(metadataKey, [
       context.getHandler(),
       context.getClass(),
     ])
@@ -46,11 +47,12 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (request.headers === undefined) throw Error('No header given')
       if (!request.headers['authorization']) throw Error('No authorization header given')
       const [bearer, token] = request.headers['authorization'].split(' ')
+      const role = request.headers['x-role']
+      if (params.roles && !params.roles.includes(role)) throw Error('Role if not authorized for operation')
       if (bearer !== 'Bearer') throw Error('Invalid bearer token')
       const bearerTokenProcessor = new BearerTokenProcessor<JWTPayloadDTO>(this.jwtService, token)
       if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
-      if (!bearerTokenProcessor.isSignatureValid(params.secret === 'SECONDARY' ? this.secondarySecret : undefined))
-        throw Error('JWT signature error')
+      if (!bearerTokenProcessor.isSignatureValid(this.secret)) throw Error('JWT signature error')
       if (params.step !== bearerTokenProcessor.payload?.type) throw Error('Invalid type')
 
       if (
@@ -69,9 +71,10 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (loginEntity.validationToken !== request.processedPayloadDTO.validationToken)
         throw Error('Invalid validation token')
       if (loginEntity.passwordToken !== request.processedPayloadDTO.passwordToken) throw Error('Invalid password token')
-
+      if (role && !loginEntity.roles.includes(role)) throw Error('User not have role for action')
       return true
     } catch (error) {
+      console.log(error)
       throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })
     }
   }

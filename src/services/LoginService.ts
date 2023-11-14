@@ -28,7 +28,6 @@ export class LoginService {
   }
 
   async update(data: UpdateLogins): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
-    // verify if login exists. If one login not exists, return error
     const loginIds = data.map((it) => it.id)
     const loginsToUpdate = await this.repository.find({ where: { id: In(loginIds) }, relations: ['user'] })
 
@@ -58,6 +57,7 @@ export class LoginService {
 
     loginEntity.password = bcrypt.hashSync(password, 10)
     loginEntity.passwordToken = v4()
+    loginEntity.validationToken = v4()
 
     await this.repository.save(loginEntity)
   }
@@ -68,6 +68,7 @@ export class LoginService {
 
     loginEntity.password = bcrypt.hashSync(password, 10)
     loginEntity.passwordToken = v4()
+    loginEntity.validationToken = v4()
 
     await this.repository.save(loginEntity)
     this.loginLogService.create({

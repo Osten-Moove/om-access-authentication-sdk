@@ -4,7 +4,7 @@ import { v4 } from 'uuid'
 import { UserEntity } from './UserEntity'
 
 @Entity({ name: 'access' })
-export class LoginEntity {
+export class LoginEntity<T extends string = string> {
   @PrimaryColumn('uuid')
   id: string
 
@@ -25,6 +25,9 @@ export class LoginEntity {
 
   @Column({ type: 'character varying', length: 50, nullable: true, name: 'otp_token' })
   otpToken: string
+
+  @Column({ type: 'character varying', array: true, name: 'roles', nullable: true })
+  roles: Array<T>
 
   @CreateDateColumn({ type: 'timestamp without time zone', default: () => 'CURRENT_TIMESTAMP', name: 'created_at' })
   createdAt: string
