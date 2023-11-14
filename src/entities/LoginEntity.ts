@@ -32,7 +32,7 @@ export class LoginEntity {
   @UpdateDateColumn({ type: 'timestamp without time zone', default: () => 'CURRENT_TIMESTAMP', name: 'updated_at' })
   updatedAt: string
 
-  @OneToOne(() => UserEntity, (user) => user.login, { cascade: ['insert'] })
+  @OneToOne(() => UserEntity, (user) => user.login, { cascade: ['insert', 'update', 'remove'] })
   @JoinColumn({ name: 'id' })
   user: UserEntity
 
