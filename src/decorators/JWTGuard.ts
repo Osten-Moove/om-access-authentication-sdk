@@ -48,7 +48,7 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (!request.headers['authorization']) throw Error('No authorization header given')
       const [bearer, token] = request.headers['authorization'].split(' ')
       const role = request.headers['x-role']
-      if (params.roles && !params.roles.includes(role)) throw Error('Role if not authorized for operation')
+      if (role && !params.roles.includes(role)) throw Error('Role if not authorized for operation')
       if (bearer !== 'Bearer') throw Error('Invalid bearer token')
       const bearerTokenProcessor = new BearerTokenProcessor<JWTPayloadDTO>(this.jwtService, token)
       if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
@@ -71,7 +71,8 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (loginEntity.validationToken !== request.processedPayloadDTO.validationToken)
         throw Error('Invalid validation token')
       if (loginEntity.passwordToken !== request.processedPayloadDTO.passwordToken) throw Error('Invalid password token')
-      if (role && !loginEntity.roles.includes(role)) throw Error('User not have role for action')
+      if (params.roles && params.roles.length > 0 && !loginEntity.roles.some((it) => params.roles.includes(it)))
+        throw Error('User not have role for action')
       return true
     } catch (error) {
       console.log(error)
