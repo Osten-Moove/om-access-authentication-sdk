@@ -7,24 +7,19 @@ export type CreateLogin = {
   password?: string
   isActive: boolean
   roles?: Array<string>
-  user: {
-    email: string
-    fullName: string
-  }
+  email: string
+  fullName: string
 }
 
 export type CreateLogins = Array<CreateLogin>
 
 export type UpdateLogin = {
-  id?: string
-  login: string
+  id: string
+  login?: string
   isActive?: boolean
   roles?: Array<string>
-  user: {
-    id?: string
-    email: string
-    fullName: string
-  }
+  email?: string
+  fullName?: string
 }
 
 export type UpdateLogins = Array<UpdateLogin>
@@ -34,10 +29,16 @@ export type GenerateJwtWithPinOptions = {
   expiresIn?: string
 }
 
-export type RequestAuthorization = {
+export type RequestAuthorization<T extends string = string> = {
   processedPayloadDTO: JWTPayloadDTO
   processedTemporaryPayloadDTO: JWTTemporaryPayloadDTO
-  headers: { 'x-temporary-authorization'?: string; 'x-email-pin'?: string; 'x-otp-pin'?: string; 'x-role'?: string }
+  headers: {
+    'x-temporary-authorization'?: string
+    'x-email-pin'?: string
+    'x-otp-pin'?: string
+    'x-user-type'?: T
+  }
+  userType?: T
 }
 
 export const enum RequiredPin {

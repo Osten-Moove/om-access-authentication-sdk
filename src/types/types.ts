@@ -4,4 +4,5 @@ export type typeArgs = { [k in ValidArgs]?: string }
 export type DecoratorConfig = {
   secret: string
   secondarySecret?: string
+  appName?: string
 }

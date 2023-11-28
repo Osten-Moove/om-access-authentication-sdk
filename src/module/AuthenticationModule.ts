@@ -4,13 +4,12 @@ import { JwtModule } from '@nestjs/jwt'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { AuthenticationJWTGuard } from '../decorators/JWTGuard'
 import { AuthenticationJWTTemporaryGuard } from '../decorators/JWTTemporaryGuard'
-import { LoginEntity, LoginLogEntity, UserEntity } from '../entities'
+import { LoginEntity, LoginLogEntity } from '../entities'
 import { AuthorizationLibDefaultOwner } from '../helpers/AuthorizationLibVariables'
 import { AuthenticationDataSource } from '../helpers/DataSource'
 import { AuthenticationService } from '../services/AuthenticationService'
 import { LoginLogService } from '../services/LoginLogService'
 import { LoginService } from '../services/LoginService'
-import { UserService } from '../services/UserService'
 import { DecoratorConfig } from '../types'
 
 @Global()
@@ -21,8 +20,8 @@ export class AuthenticationModule {
   static forRoot(database: DataSourceOptions, config?: DecoratorConfig): DynamicModule {
     this.config = config
     if (!this.config.secondarySecret) this.config.secondarySecret = this.config.secret + 'secondary'
-    const entities = [LoginEntity, LoginLogEntity, UserEntity]
-    const services = [UserService, AuthenticationService, LoginLogService, LoginService]
+    const entities = [LoginEntity, LoginLogEntity]
+    const services = [AuthenticationService, LoginLogService, LoginService]
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
     const providers = [...services, jwtGuard, jwtTemporaryGuard]
@@ -34,6 +33,8 @@ export class AuthenticationModule {
       entities,
       name: AuthorizationLibDefaultOwner,
     })
+
+    if (!config.appName) config.appName = 'OM-AUTHENTICATION-LIB'
 
     return {
       global: true,

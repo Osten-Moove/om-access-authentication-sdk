@@ -47,8 +47,9 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (request.headers === undefined) throw Error('No header given')
       if (!request.headers['authorization']) throw Error('No authorization header given')
       const [bearer, token] = request.headers['authorization'].split(' ')
-      const role = request.headers['x-role']
-      if (role && !params.roles.includes(role)) throw Error('Role if not authorized for operation')
+      request.userType = request.headers['x-user-type']
+      if (request.userType && params.roles && !params.roles.includes(request.userType))
+        throw Error('User type not authorized for operation')
       if (bearer !== 'Bearer') throw Error('Invalid bearer token')
       const bearerTokenProcessor = new BearerTokenProcessor<JWTPayloadDTO>(this.jwtService, token)
       if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
@@ -59,7 +60,7 @@ export class AuthenticationJWTGuard implements CanActivate {
         request.processedTemporaryPayloadDTO &&
         request.processedTemporaryPayloadDTO.id !== request.processedPayloadDTO.id
       )
-        throw Error('User id not math in authorized payload')
+        throw Error('User id not math in authorized payload between access and temporary payload')
 
       request.processedPayloadDTO = bearerTokenProcessor.payload
       if (request.processedHeaderDTO) {

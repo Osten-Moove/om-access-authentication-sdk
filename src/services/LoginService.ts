@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import * as bcrypt from 'bcrypt'
 import { authenticator } from 'otplib'
-import { FindOneOptions, In, Repository } from 'typeorm'
+import { FindManyOptions, FindOneOptions, In, Repository } from 'typeorm'
 import { v4 } from 'uuid'
 import { LoginEntity } from '../entities'
 import { ErrorCode } from '../helpers/ErrorCode'
@@ -29,13 +29,12 @@ export class LoginService {
 
   async update(data: UpdateLogins): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
     const loginIds = data.map((it) => it.id)
-    const loginsToUpdate = await this.repository.find({ where: { id: In(loginIds) }, relations: ['user'] })
+    const loginsToUpdate = await this.repository.find({ where: { id: In(loginIds) } })
 
     if (loginsToUpdate.length !== data.length) return [null, ErrorCode.LOGIN_NOT_FOUND]
 
     const loginsToUpdateNewData = loginsToUpdate.map((it) => {
       const newData = data.find((data) => data.id === it.id)
-      newData.user = Object.assign(it.user, newData.user)
       return Object.assign(it, newData)
     })
 
@@ -79,19 +78,13 @@ export class LoginService {
     })
   }
 
-  async getUser(userId: string) {
-    const user = await this.repository.findOne({ where: { id: userId }, relations: ['user'] })
-    if (!user) throw new Error('User not found')
-    return user
-  }
-
-  async updateOTP(userId: string) {
-    const login = await this.repository.findOne({ where: { id: userId }, relations: ['user'] })
+  async updateOTP(loginId: string) {
+    const login = await this.repository.findOne({ where: { id: loginId } })
     if (!login) throw new Error('Login not found')
 
     login.otpToken = authenticator.generateSecret()
     await this.repository.save(login)
-    return authenticator.keyuri(login.user.email, 'OstenSys', login.otpToken)
+    return authenticator.keyuri(login.email, AuthenticationModule.config.appName, login.otpToken)
   }
 
   async invalidateToken(loginId: string) {
@@ -102,7 +95,11 @@ export class LoginService {
     await this.repository.save(loginEntity)
   }
 
-  async findOne(options: FindOneOptions) {
+  async findOne(options: FindOneOptions<LoginEntity>) {
     return this.repository.findOne(options)
+  }
+
+  async find(options: FindManyOptions<LoginEntity>) {
+    return this.repository.find(options)
   }
 }
