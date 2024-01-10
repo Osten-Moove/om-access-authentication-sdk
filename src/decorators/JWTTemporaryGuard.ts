@@ -66,7 +66,6 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
 
       const pin = request.headers['x-email-pin']
       const otp = request.headers['x-otp-pin']
-      console.log(otp)
 
       switch (params.requiredPin) {
         case RequiredPin.ONLY_EMAIL:
