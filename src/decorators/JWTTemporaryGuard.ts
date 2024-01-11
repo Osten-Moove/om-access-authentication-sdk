@@ -75,12 +75,19 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
           break
         case RequiredPin.ONLY_OTP:
           if (!otp) throw Error('No otp pin given')
+          if (otp) {
+            var login: LoginEntity = await this.authService.getLoginById(request.processedHeaderDTO.userId)
+            if (!this.authService.validateOtp(login.otpToken, otp)) throw Error('Invalid otp code')
+          }
           break
         case RequiredPin.ANY:
           if (!pin && !otp) throw Error('No pin specified')
           if (pin) {
             if (!this.authService.validatePin(request.processedTemporaryPayloadDTO.pin, pin))
               throw Error('Invalid email pin')
+          } else {
+            var login: LoginEntity = await this.authService.getLoginById(request.processedHeaderDTO.userId)
+            if (!this.authService.validateOtp(login.otpToken, otp)) throw Error('Invalid otp code')
           }
           break
         default:

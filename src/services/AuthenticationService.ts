@@ -10,6 +10,7 @@ import { generateNumberString } from '../helpers/GeneratePin'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { GenerateJwtWithPinOptions } from '../types/LoginTypes'
 import { LoginLogService } from './LoginLogService'
+import { authenticator } from 'otplib'
 
 @Injectable()
 export class AuthenticationService {
@@ -26,6 +27,13 @@ export class AuthenticationService {
     return this.repository.findOne({
       where: { id: loginId },
       select: { id: true, passwordToken: true, validationToken: true, roles: true },
+    })
+  }
+
+  getLoginById(loginId: string) {
+    return this.repository.findOne({
+      where: { id: loginId },
+      select: { id: true, passwordToken: true, otpToken: true, roles: true, fullName: true },
     })
   }
 
@@ -54,6 +62,10 @@ export class AuthenticationService {
     const token = this.generateSecondaryJWT(payload, _options.expiresIn)
 
     return { token, pin }
+  }
+
+  validateOtp(validationToken: string, pin: string): boolean {
+    return authenticator.check(pin, validationToken)
   }
 
   validatePin(validationToken: string, pin: string): boolean {
