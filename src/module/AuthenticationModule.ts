@@ -11,6 +11,7 @@ import { AuthenticationService } from '../services/AuthenticationService'
 import { LoginLogService } from '../services/LoginLogService'
 import { LoginService } from '../services/LoginService'
 import { DecoratorConfig } from '../types'
+import { ApiKeyLogService } from '../services/ApiKeyLogService'
 
 @Global()
 @Module({})
@@ -21,7 +22,7 @@ export class AuthenticationModule {
     this.config = config
     if (!this.config.secondarySecret) this.config.secondarySecret = this.config.secret + 'secondary'
     const entities = [LoginEntity, LoginLogEntity, ApiKeyEntity, ApiKeyLogEntity]
-    const services = [AuthenticationService, LoginLogService, LoginService]
+    const services = [AuthenticationService, LoginLogService, LoginService, ApiKeyLogService]
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
     const providers = [...services, jwtGuard, jwtTemporaryGuard]
