@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { AuthenticationJWTGuard } from '../decorators/JWTGuard'
 import { AuthenticationJWTTemporaryGuard } from '../decorators/JWTTemporaryGuard'
-import { LoginEntity, LoginLogEntity } from '../entities'
+import { LoginEntity, LoginLogEntity, ApiKeyEntity } from '../entities'
 import { AuthorizationLibDefaultOwner } from '../helpers/AuthorizationLibVariables'
 import { AuthenticationDataSource } from '../helpers/DataSource'
 import { AuthenticationService } from '../services/AuthenticationService'
@@ -20,7 +20,7 @@ export class AuthenticationModule {
   static forRoot(database: DataSourceOptions, config?: DecoratorConfig): DynamicModule {
     this.config = config
     if (!this.config.secondarySecret) this.config.secondarySecret = this.config.secret + 'secondary'
-    const entities = [LoginEntity, LoginLogEntity]
+    const entities = [LoginEntity, LoginLogEntity, ApiKeyEntity]
     const services = [AuthenticationService, LoginLogService, LoginService]
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
