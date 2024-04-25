@@ -110,4 +110,25 @@ export class ApiKeyService {
 
     return [removedEntity, null]
   }
+
+  async validate(publicKey?: string, secretKey?: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+    if(!publicKey && !secretKey) return [null,
+        ErrorCode.PUBLIC_KEY_AND_SECRET_KEY_NOT_GIVEN]
+
+    const apiKey = await this.repository.findOne({ where: { secretKey, publicKey } })
+    if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
+
+    if (!apiKey.isActive) return  [null, ErrorCode.API_KEY_DEACTIVATED]
+
+    const { API_KEY_VALIDATED } = ApiKeyLogEvents
+
+    this.apiKeyLogService.register({
+        eventCode: API_KEY_VALIDATED.code,
+        eventMessage: API_KEY_VALIDATED.message,
+        apiKeyId: apiKey.id,
+        ...options
+    })
+
+    return [apiKey, null]
+  }
 }
