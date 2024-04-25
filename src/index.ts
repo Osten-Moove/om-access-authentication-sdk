@@ -1,3 +1,4 @@
+export { APIGuard } from './decorators/APIGuard'
 export { JWTGuard } from './decorators/JWTGuard'
 export { JWTTemporaryGuard } from './decorators/JWTTemporaryGuard'
 export * from './entities'
