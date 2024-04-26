@@ -14,6 +14,7 @@ import { DecoratorConfig } from '../types'
 import { ApiKeyLogService } from '../services/ApiKeyLogService'
 import { ApiKeyService } from '../services/ApiKeyService'
 import { AuthenticationAPIGuard } from '../decorators/APIGuard'
+import { AuthenticationAPIPublicKeyGuard } from '../decorators/APIPublicKeyGuard'
 
 @Global()
 @Module({})
@@ -26,9 +27,10 @@ export class AuthenticationModule {
     const entities = [LoginEntity, LoginLogEntity, ApiKeyEntity, ApiKeyLogEntity]
     const services = [AuthenticationService, LoginLogService, LoginService, ApiKeyLogService, ApiKeyService]
     const apiKeyGuard = { provide: APP_GUARD, useClass: AuthenticationAPIGuard }
+    const apiPublicKeyGuard = { provide: APP_GUARD, useClass: AuthenticationAPIPublicKeyGuard }
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
-    const providers = [...services, jwtGuard, jwtTemporaryGuard, apiKeyGuard]
+    const providers = [...services, jwtGuard, jwtTemporaryGuard, apiKeyGuard, apiPublicKeyGuard]
     const imports = [JwtModule.register({ secret: this.config.secret })]
     const exports = [...services, JwtModule]
 
