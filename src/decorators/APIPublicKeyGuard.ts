@@ -15,7 +15,7 @@ import { ApiKeyLogService } from '../services/ApiKeyLogService'
 import { ApiKeyLogEvents } from '../types/ApiKeyLogTypes'
 import { ErrorMessage } from '../helpers/ErrorCode'
 
-const metadataKey = AuthorizationLibDefaultOwner + 'API_KEY_GUARD'
+const metadataKey = AuthorizationLibDefaultOwner + 'API_PUBLIC_KEY_GUARD'
 
 export const APIPublicKeyGuard = (scope: string, roles: Array<string> = null) => SetMetadata(metadataKey, { scope, roles })
 
