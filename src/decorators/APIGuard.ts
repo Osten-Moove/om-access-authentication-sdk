@@ -50,7 +50,10 @@ export class AuthenticationAPIGuard implements CanActivate {
 
             const secretKey: string = request.headers['authorization']
 
-            const [apiKey, errorValidateApiKey] = await this.apiKeyService.validate(null, secretKey)
+            const [apiKey, errorValidateApiKey] = await this.apiKeyService.validate(null, secretKey, {
+                agent: request.userType,
+                eventScope: params.scope
+            })
 
             if (errorValidateApiKey) throw new Error(ErrorMessage[errorValidateApiKey])
 

@@ -50,7 +50,10 @@ export class AuthenticationAPIPublicKeyGuard implements CanActivate {
 
             const publicKey: string = request.headers['x-public-key']
 
-            const [apiKey, errorValidateApiKey] = await this.apiKeyService.validate(publicKey)
+            const [apiKey, errorValidateApiKey] = await this.apiKeyService.validate(publicKey, null, {
+                agent: request.userType,
+                eventScope: params.scope
+            })
 
             if (errorValidateApiKey) throw new Error(ErrorMessage[errorValidateApiKey])
 

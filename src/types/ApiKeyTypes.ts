@@ -13,4 +13,5 @@ export type UpdateApiKeyRequest = {
 export type ApiKeyOptionsRequest = {
   ipAddress?: string
   agent?: string
+  eventScope?: string
 }
