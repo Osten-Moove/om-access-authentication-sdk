@@ -10,7 +10,7 @@ export class ApiKeyEntity<T extends string = string> {
   @Column({ type: 'uuid', name: 'public_key', unique: true })
   publicKey: string
 
-  @Column({ type: 'uuid', name: 'public_key', unique: true })
+  @Column({ type: 'uuid', name: 'secret_key', unique: true })
   secretKey: string
 
   @Column({ type: 'boolean', name: 'is_active', default: true })
