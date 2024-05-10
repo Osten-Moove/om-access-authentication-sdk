@@ -2,6 +2,7 @@
 /Dist
 /dist
 /node_modules
+/.yalc
 
 # Logs
 logs
