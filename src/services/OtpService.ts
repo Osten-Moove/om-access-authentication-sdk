@@ -87,6 +87,9 @@ export class OtpService {
     const tokenIsValid = authenticator.check(token, login.otpToken)
     if (!tokenIsValid) return [null, ErrorCode.TOKEN_OTP_INVALID]
 
+    login.otpToken = null
+    await this.repository.save(login)
+
     return [true, null]
   }
 }
