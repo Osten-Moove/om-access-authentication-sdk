@@ -78,15 +78,6 @@ export class LoginService {
     })
   }
 
-  async updateOTP(loginId: string) {
-    const login = await this.repository.findOne({ where: { id: loginId } })
-    if (!login) throw new Error('Login not found')
-
-    login.otpToken = authenticator.generateSecret()
-    await this.repository.save(login)
-    return authenticator.keyuri(login.email, AuthenticationModule.config.appName, login.otpToken)
-  }
-
   async invalidateToken(loginId: string) {
     const loginEntity = await this.repository.findOne({ where: { id: loginId } })
     if (!loginEntity) throw new Error('Login entity not found')
