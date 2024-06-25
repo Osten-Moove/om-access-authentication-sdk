@@ -13,6 +13,7 @@ export class JWTTemporaryPayloadDTO<T extends Record<string, any> | null = null 
     this.type = payload.type
     this.validationToken = payload.validationToken
     this.passwordToken = payload.passwordToken
+    this.moreInfo = payload.moreInfo
   }
 
   static createPayload<R>(payload: Partial<JWTTemporaryPayloadDTO<R>>) {

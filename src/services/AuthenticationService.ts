@@ -50,7 +50,7 @@ export class AuthenticationService {
     const pin = generateNumberString(_options.pinLength)
     const login = await this.getLoginForGenerateToken(id)
     const pinHash = bcrypt.hashSync(pin, 10)
-    const payload: Partial<JWTTemporaryPayloadDTO<T>> = { id, type, pin: pinHash, ...login, ...moreInfo }
+    const payload: Partial<JWTTemporaryPayloadDTO<T>> = { id, type, pin: pinHash,  moreInfo, ...login}
 
     const token = this.generateSecondaryJWT<T>(payload, _options.expiresIn)
 
@@ -65,8 +65,8 @@ export class AuthenticationService {
     const loginEntity = await this.getLoginForGenerateToken(loginId)
 
     return {
-      access: this.generatePrimaryJWT<T>({ id: loginId, type: 'ACCESS', ...loginEntity, ...moreInfo }),
-      refresh: this.generatePrimaryJWT<T>({ id: loginId, type: 'REFRESH', ...loginEntity, ...moreInfo }),
+      access: this.generatePrimaryJWT<T>({ id: loginId, type: 'ACCESS', moreInfo, ...loginEntity}),
+      refresh: this.generatePrimaryJWT<T>({ id: loginId, type: 'REFRESH', moreInfo, ...loginEntity }),
     }
   }
 

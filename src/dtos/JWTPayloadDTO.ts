@@ -14,7 +14,7 @@ export class JWTPayloadDTO<T extends Record<string,any> | null = null > {
   }
 
   static createPayload<T>(payload: Partial<JWTPayloadDTO<T>>) {
-    return { payload: new JWTPayloadDTO(payload) }
+    return { payload: new JWTPayloadDTO<T>(payload) }
   }
 
   static matchesObject<T>(data?: Partial<JWTPayloadDTO<T>>): boolean {
