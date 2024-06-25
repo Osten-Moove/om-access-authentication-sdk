@@ -31,7 +31,7 @@ export class AuthenticationJWTGuard implements CanActivate {
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
   }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate<T>(context: ExecutionContext): Promise<boolean> {
     const params = this.reflector.getAllAndOverride<{ step: string; roles: Array<string> }>(metadataKey, [
       context.getHandler(),
       context.getClass(),
@@ -40,7 +40,7 @@ export class AuthenticationJWTGuard implements CanActivate {
     if (!params) return true
 
     try {
-      const request: RequestAuthorization & { headers: any; processedHeaderDTO: any } = context
+      const request: RequestAuthorization<T> & { headers: any; processedHeaderDTO: any} = context
         .switchToHttp()
         .getRequest()
 
@@ -51,7 +51,7 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (request.userType && params.roles && !params.roles.includes(request.userType))
         throw Error('User type not authorized for operation')
       if (bearer !== 'Bearer') throw Error('Invalid bearer token')
-      const bearerTokenProcessor = new BearerTokenProcessor<JWTPayloadDTO>(this.jwtService, token)
+      const bearerTokenProcessor = new BearerTokenProcessor<T, JWTPayloadDTO<T>>(this.jwtService, token)
       if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
       if (!bearerTokenProcessor.isSignatureValid(this.secret)) throw Error('JWT signature error')
       if (params.step !== bearerTokenProcessor.payload?.type) throw Error('Invalid type')
