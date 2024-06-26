@@ -29,9 +29,9 @@ export type GenerateJwtWithPinOptions = {
   expiresIn?: string
 }
 
-export type RequestAuthorization<T extends string = string> = {
-  processedPayloadDTO: JWTPayloadDTO
-  processedTemporaryPayloadDTO: JWTTemporaryPayloadDTO
+export type RequestAuthorization<R = null,T extends string = string> = {
+  processedPayloadDTO: JWTPayloadDTO<R>
+  processedTemporaryPayloadDTO: JWTTemporaryPayloadDTO<R>
   headers: {
     'x-temporary-authorization'?: string
     'x-email-pin'?: string

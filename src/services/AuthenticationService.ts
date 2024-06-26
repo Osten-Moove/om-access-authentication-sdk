@@ -29,29 +29,30 @@ export class AuthenticationService {
     })
   }
 
-  private generatePrimaryJWT(payload: Partial<JWTPayloadDTO>, expiresIn = '1d') {
+  private generatePrimaryJWT<T>(payload: Partial<JWTPayloadDTO<T>>, expiresIn = '1d') {
     const p = JWTPayloadDTO.createPayload(payload)
     const options: JwtSignOptions = { expiresIn }
     return this.jwtService.sign(p, options)
   }
 
-  private generateSecondaryJWT(payload: Partial<JWTTemporaryPayloadDTO>, expiresIn = '1d') {
+  private generateSecondaryJWT<R>(payload: Partial<JWTTemporaryPayloadDTO<R>>, expiresIn = '1d') {
     const p = JWTTemporaryPayloadDTO.createPayload(payload)
     const options: JwtSignOptions = { expiresIn, secret: AuthenticationModule.config.secondarySecret }
     return this.jwtService.sign(p, options)
   }
 
-  async generateTemporaryJWT(id: string, type: string, options?: GenerateJwtWithPinOptions) {
+  async generateTemporaryJWT<T>(id: string, type: string, options?: GenerateJwtWithPinOptions, moreInfo?: T) {
     const _options: GenerateJwtWithPinOptions = Object.assign(
       { pinLength: 6, expiresIn: '10m' } as GenerateJwtWithPinOptions,
       options,
     )
+    
     const pin = generateNumberString(_options.pinLength)
     const login = await this.getLoginForGenerateToken(id)
     const pinHash = bcrypt.hashSync(pin, 10)
-    const payload: Partial<JWTTemporaryPayloadDTO> = { id, type, pin: pinHash, ...login }
+    const payload: Partial<JWTTemporaryPayloadDTO<T>> = { id, type, pin: pinHash,  moreInfo, ...login}
 
-    const token = this.generateSecondaryJWT(payload, _options.expiresIn)
+    const token = this.generateSecondaryJWT<T>(payload, _options.expiresIn)
 
     return { token, pin }
   }
@@ -60,11 +61,12 @@ export class AuthenticationService {
     return bcrypt.compareSync(pin, validationToken)
   }
 
-  async generateJWTAccess(loginId: string) {
+  async generateJWTAccess<T>(loginId: string, moreInfo?: T) {
     const loginEntity = await this.getLoginForGenerateToken(loginId)
+
     return {
-      access: this.generatePrimaryJWT({ id: loginId, type: 'ACCESS', ...loginEntity }),
-      refresh: this.generatePrimaryJWT({ id: loginId, type: 'REFRESH', ...loginEntity }),
+      access: this.generatePrimaryJWT<T>({ id: loginId, type: 'ACCESS', moreInfo, ...loginEntity}),
+      refresh: this.generatePrimaryJWT<T>({ id: loginId, type: 'REFRESH', moreInfo, ...loginEntity }),
     }
   }
 
