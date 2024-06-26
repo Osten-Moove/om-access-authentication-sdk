@@ -52,7 +52,7 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
     return true
   }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
+  async canActivate<T>(context: ExecutionContext): Promise<boolean> {
     const params = this.reflector.getAllAndOverride<{ step: string; requiredPin: RequiredPin }>(metadataKey, [
       context.getHandler(),
       context.getClass(),
@@ -61,12 +61,12 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
     if (!params) return true
 
     try {
-      const request: RequestAuthorization & { processedHeaderDTO: any } = context.switchToHttp().getRequest()
+      const request: RequestAuthorization<T> & { processedHeaderDTO: any } = context.switchToHttp().getRequest()
 
       if (request.headers === undefined) throw Error('No header given')
       if (!request.headers['x-temporary-authorization']) throw Error('No authorization header given')
       const token = request.headers['x-temporary-authorization']
-      const bearerTokenProcessor = new BearerTokenProcessor<JWTTemporaryPayloadDTO>(this.jwtService, token)
+      const bearerTokenProcessor = new BearerTokenProcessor<T, JWTTemporaryPayloadDTO<T>>(this.jwtService, token)
       if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
       if (!bearerTokenProcessor.isSignatureValid(this.secondarySecret)) throw Error('JWT signature error')
       if (params.step !== bearerTokenProcessor.payload?.type) throw Error('Invalid step')

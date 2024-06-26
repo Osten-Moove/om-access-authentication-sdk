@@ -2,7 +2,7 @@ import { JwtService } from '@nestjs/jwt'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
 
-export class BearerTokenProcessor<T = JWTPayloadDTO | JWTTemporaryPayloadDTO> {
+export class BearerTokenProcessor<R,T = JWTPayloadDTO<R> | JWTTemporaryPayloadDTO<R>> {
   private jwtService: JwtService
   token: string = ''
   payload?: T
@@ -31,7 +31,7 @@ export class BearerTokenProcessor<T = JWTPayloadDTO | JWTTemporaryPayloadDTO> {
     return !!this.payload && JWTPayloadDTO.matchesObject(this.payload)
   }
 
-  create(payload: JWTPayloadDTO, expirationTime: string = '1d'): string {
+  create(payload: JWTPayloadDTO<R>, expirationTime: string = '1d'): string {
     const options = expirationTime ? { expiresIn: expirationTime } : undefined
     return this.jwtService.sign({ payload }, options)
   }
