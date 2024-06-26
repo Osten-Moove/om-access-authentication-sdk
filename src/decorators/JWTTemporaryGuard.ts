@@ -17,6 +17,7 @@ import { BearerTokenProcessor } from '../helpers/BearerTokenProcessor'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { AuthenticationService } from '../services/AuthenticationService'
 import { RequestAuthorization, RequiredPin } from '../types/LoginTypes'
+import { OtpService } from '../services/OtpService'
 
 const metadataKey = AuthorizationLibDefaultOwner + 'JWT_TEMPORARY_GUARD'
 
@@ -31,9 +32,24 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
     private reflector: Reflector,
     @Inject(JwtService) private readonly jwtService: JwtService,
     private readonly authService: AuthenticationService,
+    private readonly otpService: OtpService,
   ) {
     this.secondarySecret = AuthenticationModule.config.secondarySecret
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
+  }
+
+  private async validateOtpToken(loginId: string, otp: string) {
+    const [tokenIsValid] = await this.otpService.validateOTP(loginId, otp)
+    if (!tokenIsValid) throw Error('Invalid otp pin')
+
+    return true
+  }
+
+  private async validateEmailToken(pin: string, plainPin: string) {
+    const pinIsValid = this.authService.validatePin(pin, plainPin)
+    if (!pinIsValid) throw Error('Invalid email pin')
+
+    return true
   }
 
   async canActivate<T>(context: ExecutionContext): Promise<boolean> {
@@ -70,18 +86,16 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
       switch (params.requiredPin) {
         case RequiredPin.ONLY_EMAIL:
           if (!pin) throw Error('No email pin given')
-          if (!this.authService.validatePin(request.processedTemporaryPayloadDTO.pin, pin))
-            throw Error('Invalid email pin')
+          await this.validateEmailToken(request.processedTemporaryPayloadDTO.pin, pin)
           break
         case RequiredPin.ONLY_OTP:
           if (!otp) throw Error('No otp pin given')
+          await this.validateOtpToken(request.processedTemporaryPayloadDTO.id, otp)
           break
         case RequiredPin.ANY:
           if (!pin && !otp) throw Error('No pin specified')
-          if (pin) {
-            if (!this.authService.validatePin(request.processedTemporaryPayloadDTO.pin, pin))
-              throw Error('Invalid email pin')
-          }
+          if (pin) await this.validateEmailToken(request.processedTemporaryPayloadDTO.pin, pin)
+          if (otp) await this.validateOtpToken(request.processedTemporaryPayloadDTO.id, otp)
           break
         default:
           break
