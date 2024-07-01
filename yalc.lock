@@ -1,9 +1,0 @@
-{
-  "version": "v1",
-  "packages": {
-    "@om-access/authentication-sdk": {
-      "signature": "62f4d1094761402f6afdc5abaf7b2f9f",
-      "file": true
-    }
-  }
-}
