@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { DataSource, DataSourceOptions } from 'typeorm'
 import { AuthenticationJWTGuard } from '../decorators/JWTGuard'
 import { AuthenticationJWTTemporaryGuard } from '../decorators/JWTTemporaryGuard'
-import { LoginEntity, LoginLogEntity } from '../entities'
+import { LoginEntity, LoginLogEntity, } from '../entities'
 import { AuthorizationLibDefaultOwner } from '../helpers/AuthorizationLibVariables'
 import { AuthenticationDataSource } from '../helpers/DataSource'
 import { AuthenticationService } from '../services/AuthenticationService'
@@ -12,6 +12,11 @@ import { LoginLogService } from '../services/LoginLogService'
 import { LoginService } from '../services/LoginService'
 import { DecoratorConfig } from '../types'
 import { OtpService } from '../services/OtpService'
+import { ApiKeyLogService } from '../services/ApiKeyLogService'
+import { ApiKeyService } from '../services/ApiKeyService'
+import { AuthenticationAPIGuard } from '../decorators/APIGuard'
+import { ApiKeyEntity } from '../entities/ApiKeyEntity'
+import { ApiKeyLogEntity } from '../entities/ApiKeyLogEntity'
 
 @Global()
 @Module({})
@@ -21,11 +26,13 @@ export class AuthenticationModule {
   static forRoot(database: DataSourceOptions, config?: DecoratorConfig): DynamicModule {
     this.config = config
     if (!this.config.secondarySecret) this.config.secondarySecret = this.config.secret + 'secondary'
-    const entities = [LoginEntity, LoginLogEntity]
-    const services = [AuthenticationService, LoginLogService, LoginService, OtpService]
+    const entities = [LoginEntity, LoginLogEntity, ApiKeyEntity, ApiKeyLogEntity]
+    const services = [AuthenticationService, LoginLogService, LoginService, OtpService,ApiKeyLogService, ApiKeyService]
+    const apiKeyGuard = { provide: APP_GUARD, useClass: AuthenticationAPIGuard }
+
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
-    const providers = [...services, jwtGuard, jwtTemporaryGuard]
+    const providers = [...services, jwtGuard, jwtTemporaryGuard, apiKeyGuard]
     const imports = [JwtModule.register({ secret: this.config.secret })]
     const exports = [...services, JwtModule]
 

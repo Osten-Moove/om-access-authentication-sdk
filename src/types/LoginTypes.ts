@@ -1,3 +1,4 @@
+import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
 
@@ -30,8 +31,10 @@ export type GenerateJwtWithPinOptions = {
 }
 
 export type RequestAuthorization<R = null,T extends string = string> = {
-  processedPayloadDTO: JWTPayloadDTO<R>
-  processedTemporaryPayloadDTO: JWTTemporaryPayloadDTO<R>
+  processedPayloadDTO?: JWTPayloadDTO<R>
+  processedApiPayloadDTO?:JWTApiPayloadDTO
+  processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
+
   headers: {
     'x-temporary-authorization'?: string
     'x-email-pin'?: string

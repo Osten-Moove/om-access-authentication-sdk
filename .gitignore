@@ -42,3 +42,6 @@ lerna-debug.log*
 
 .npmrc
 index.html
+
+yalc.lock
+package-lock.json
