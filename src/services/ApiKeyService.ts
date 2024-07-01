@@ -1,6 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common'
-import * as bcrypt from 'bcrypt'
-import { randomUUID } from 'node:crypto'
 import { ErrorCode } from '../helpers/ErrorCode'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { ApiKeyLogService } from './ApiKeyLogService'
@@ -8,25 +6,33 @@ import type { Repository } from 'typeorm'
 import { ApiKeyEntity } from '../entities/ApiKeyEntity'
 import { ApiKeyOptionsRequest, GenerateApiKeyRequest } from '../types/ApiKeyTypes'
 import { ApiKeyLogEvents } from '../types/ApiKeyLogTypes'
-
-
+import { CryptonSecurity } from '../helpers/Crypton'
+import { randomUUID } from 'node:crypto'
 
 
 @Injectable()
 export class ApiKeyService {
   private repository: Repository<ApiKeyEntity>
 
-  constructor(@Inject(ApiKeyLogService) private readonly apiKeyLogService: ApiKeyLogService) {
+  constructor(@Inject(ApiKeyLogService) private readonly apiKeyLogService: ApiKeyLogService,
+) {
     this.repository = AuthenticationModule.connection.getRepository(ApiKeyEntity)
   }
 
-  async generate(data: GenerateApiKeyRequest, options?: ApiKeyOptionsRequest, apiSecretKey?: string): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+  async generate(data: GenerateApiKeyRequest, options?: ApiKeyOptionsRequest): Promise< ApiKeyEntity | [ApiKeyEntity, ErrorCode]> {
+    
+    const newSecretKey = CryptonSecurity.generateRandom()
+
+    const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
+
     const apiKeyEntity = this.repository.create({
       ...data,
-      secretKey: bcrypt.hashSync(apiSecretKey ?  apiSecretKey : randomUUID(), 10)
+      roles: !data.roles && ["Company"] ,
+      publicKey: randomUUID().replace(/-/g, ''),
+      secretKey: cryptSecretKey
     })
+    
     const entitySaved = await this.repository.save(apiKeyEntity)
-
     const { API_KEY_GENERATED } = ApiKeyLogEvents
 
     this.apiKeyLogService.register({
@@ -36,14 +42,19 @@ export class ApiKeyService {
         ...options
     })
 
-    return [entitySaved, null]
+    return {...entitySaved, secretKey:  newSecretKey}
   }
 
-  async regenerate(apiKeyId: string, options?: ApiKeyOptionsRequest, apiSecretKey?: string ): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+  async regenerate(apiKeyId: string, options?: ApiKeyOptionsRequest ): Promise< ApiKeyEntity | [ApiKeyEntity, ErrorCode]> {
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
+   
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
-    apiKey.secretKey = await bcrypt.hash(apiSecretKey ? apiSecretKey : randomUUID(), 10)
+    const newSecretKey = CryptonSecurity.generateRandom()
+    
+    const cryptSecretKey = CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
+
+    apiKey.secretKey = cryptSecretKey
 
     const entitySaved = await this.repository.save(apiKey)
 
@@ -56,7 +67,7 @@ export class ApiKeyService {
         ...options
     })
 
-    return [entitySaved, null]
+    return {...entitySaved, secretKey:  newSecretKey}
   }
 
   async activate(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
@@ -65,7 +76,15 @@ export class ApiKeyService {
 
     apiKey.isActive = true
 
-    const entitySaved = await this.repository.save(apiKey)
+    const newSecretKey = CryptonSecurity.generateRandom()
+
+    const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
+
+
+    const entitySaved = await this.repository.save({
+      ...apiKey,
+      secretKey: cryptSecretKey
+    })
 
     const { API_KEY_ACTIVATED } = ApiKeyLogEvents
 
@@ -76,7 +95,7 @@ export class ApiKeyService {
         ...options
     })
 
-    return [entitySaved, null]
+    return [{...entitySaved, secretKey: newSecretKey }, null]
   }
 
   async deactivate(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
@@ -96,6 +115,9 @@ export class ApiKeyService {
         ...options
     })
 
+    delete entitySaved.secretKey
+    delete entitySaved.publicKey
+    
     return [entitySaved, null]
   }
 
@@ -118,10 +140,12 @@ export class ApiKeyService {
   }
 
   async validate(publicKey?: string, secretKey?: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+   
     if(!publicKey && !secretKey) return [null,
         ErrorCode.PUBLIC_KEY_AND_SECRET_KEY_NOT_GIVEN]
 
-    const apiKey = await this.repository.findOne({ where: { secretKey  } })
+    const apiKey = await this.repository.findOne({ where: { publicKey, secretKey } })
+
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
     if (!apiKey.isActive) return  [null, ErrorCode.API_KEY_DEACTIVATED]

@@ -15,4 +15,5 @@ export const ApiKeyLogEvents = {
   API_KEY_REVOKED: { code: 'API_KEY_REVOKED', message: 'An api key was revoked.' },
   API_KEY_VALIDATED: { code: 'API_KEY_VALIDATED', message: 'An api key was validated.' },
   API_KEY_USED: { code: 'API_KEY_USED', message: 'An api key was used.' },
+  API_KEY_SECRET_KEY:{ code: 'SECRET_KEY', message: 'The JWT is not valid. '},
 }

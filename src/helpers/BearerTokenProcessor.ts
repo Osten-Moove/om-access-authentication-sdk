@@ -12,6 +12,7 @@ export class BearerTokenProcessor<R,T = JWTPayloadDTO<R> | JWTTemporaryPayloadDT
   constructor(jwtService: JwtService, token?: string) {
     this.jwtService = jwtService
     if (token) this.token = token
+
   }
 
   isBearerToken(): boolean {

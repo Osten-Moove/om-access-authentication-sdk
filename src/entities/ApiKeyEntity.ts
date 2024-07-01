@@ -1,16 +1,18 @@
 import { randomUUID } from 'node:crypto'
-import * as bcrypt from 'bcrypt'
-import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
+import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'api_keys' })
 export class ApiKeyEntity<T extends string = string> {
-  @PrimaryColumn('uuid')
+
+  @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({ type: 'uuid', name: 'secret_key', unique: true })
+  @Column({ type: 'character varying',  length: 40 ,name: 'public_key', nullable: true })
+  publicKey: string
+
+  @Column({ type: 'character varying', name: 'secret_key', unique: true , length: 255})
   secretKey: string
   
-
   @Column({ type: 'boolean', name: 'is_active', default: true })
   isActive: boolean
 
@@ -26,6 +28,7 @@ export class ApiKeyEntity<T extends string = string> {
   @UpdateDateColumn({ type: 'timestamp without time zone', default: () => 'CURRENT_TIMESTAMP', name: 'updated_at' })
   updatedAt: string
 
+  
   constructor(entity?: {
     isActive?: boolean
     alias?: string
@@ -37,7 +40,6 @@ export class ApiKeyEntity<T extends string = string> {
     if (entity.alias) this.alias = entity.alias
     if (entity.isActive) this.isActive = entity.isActive
     if (entity.roles) this.roles = entity.roles
-    if (entity.apiKey) this.secretKey = bcrypt.hashSync(entity.apiKey, 10)
       
     this.id = randomUUID()
   }
