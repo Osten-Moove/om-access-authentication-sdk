@@ -25,7 +25,12 @@ export class ApiKeyService {
 
     const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
 
-    const apiKeyEntity = this.repository.create({
+
+    const findAlreadyExists = await this.repository.findOne({ where: { alias: data.alias } })
+
+    if (findAlreadyExists) return [null, ErrorCode.API_KEY_ALREADY_EXISTS]
+
+    const apiKeyEntity = await this.repository.create({
       ...data,
       roles: !data.roles && ["Company"] ,
       publicKey: randomUUID().replace(/-/g, ''),
