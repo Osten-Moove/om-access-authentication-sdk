@@ -1,18 +1,22 @@
 import * as crypto from 'crypto';
 
-export class CryptonSecurity  {
-  static algorithm = 'aes-256-cbc'
-  static iv = '1234567890abcdef1234567890abcdef'
+export class CryptonSecurity {
+  static algorithm = 'aes-256-cbc';
+  static iv = '1234567890abcdef1234567890abcdef'; // 16 bytes em hexadecimal
 
   static encrypt(secretKey: string, encryptionKey: string): string {
-    const cipher = crypto.createCipheriv(this.algorithm, Buffer.from(encryptionKey, 'utf-8'), Buffer.from(this.iv, 'hex'));
+    const key = crypto.createHash('sha256').update(encryptionKey).digest();
+
+    const cipher = crypto.createCipheriv(this.algorithm, key, Buffer.from(this.iv, 'hex'));
     let encrypted = cipher.update(secretKey, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     return encrypted;
   }
 
   static decrypt(encryptedSecretKey: string, encryptionKey: string): string {
-    const decipher = crypto.createDecipheriv(this.algorithm, Buffer.from(encryptionKey, 'utf-8'), Buffer.from(this.iv, 'hex'));
+    const key = crypto.createHash('sha256').update(encryptionKey).digest();
+
+    const decipher = crypto.createDecipheriv(this.algorithm, key, Buffer.from(this.iv, 'hex'));
     let decrypted = decipher.update(encryptedSecretKey, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
     return decrypted;
@@ -27,7 +31,6 @@ export class CryptonSecurity  {
     for (let i = 0; i < length; i++) {
       password += chars[bytes[i] % chars.length];
     }
-    
     return password;
   }
 }

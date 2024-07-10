@@ -25,7 +25,7 @@ export class ApiKeyService {
 
     const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
 
-    const apiKeyEntity = this.repository.create({
+    const apiKeyEntity = await this.repository.create({
       ...data,
       roles: !data.roles && ["Company"] ,
       publicKey: randomUUID().replace(/-/g, ''),
