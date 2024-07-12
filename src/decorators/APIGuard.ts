@@ -50,7 +50,7 @@ export class AuthenticationAPIGuard implements CanActivate {
         if (!params) return true
 
         try {
-            const request: RequestAuthorization & { headers: any } = context
+            const request: RequestAuthorization<T> & { headers: any } = context
             .switchToHttp()
             .getRequest()
 
@@ -62,10 +62,10 @@ export class AuthenticationAPIGuard implements CanActivate {
 
             if (request.userType && params.roles && !params.roles.includes(request.userType)) throw Error('User type not authorized for operation')
             if (bearer !== 'Bearer') throw Error('Invalid bearer token')
-            const bearerTokenProcessor = new BearerTokenProcessor<T, JWTApiPayloadDTO>(this.jwtService, token)
+            const bearerTokenProcessor = new BearerTokenProcessor<T, JWTApiPayloadDTO<T>>(this.jwtService, token)
             if (!bearerTokenProcessor.isBearerToken()) throw Error('JWT decode error')
             
-            const  { publicKey }  = this.jwtService.decode(token) as { publicKey: string}
+            const  { publicKey, ...props }  = this.jwtService.decode(token) as { publicKey: string, moreInfo: T}
             
             const [apiKey, errorValidateApiKey] = await this.apiKeyService.validate(publicKey ,null, {
                 agent: "mudar",
@@ -91,12 +91,14 @@ export class AuthenticationAPIGuard implements CanActivate {
                 
                 throw warn("The JWT is not valid. Please create the JWT with the correct secret key.")
             }
-
             request.processedApiPayloadDTO = { 
                 alias: apiKey.alias,
                 isActive: apiKey.isActive,
                 roles: apiKey.roles,
                 id: apiKey.id,
+                moreInfo: {
+                    ...props.moreInfo
+                }
             }
 
             if (params.roles && params.roles.length > 0 && !apiKey.roles.some((role) => params.roles.includes(role)))

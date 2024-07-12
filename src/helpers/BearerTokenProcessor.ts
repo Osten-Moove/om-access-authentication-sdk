@@ -1,8 +1,9 @@
 import { JwtService } from '@nestjs/jwt'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
+import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
 
-export class BearerTokenProcessor<R,T = JWTPayloadDTO<R> | JWTTemporaryPayloadDTO<R>> {
+export class BearerTokenProcessor<R,T = JWTPayloadDTO<R> | JWTTemporaryPayloadDTO<R> | JWTApiPayloadDTO<R>>  {
   private jwtService: JwtService
   token: string = ''
   payload?: T
