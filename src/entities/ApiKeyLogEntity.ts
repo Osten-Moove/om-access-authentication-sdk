@@ -1,5 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { before } from 'node:test';
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { ApiKeyEntity } from './ApiKeyEntity'
+import { Logger } from '@duaneoli/logger';
+import { AuthenticationModule } from '../module/AuthenticationModule';
 
 @Entity({ name: 'api_key_logs' })
 export class ApiKeyLogEntity {
@@ -34,5 +37,13 @@ export class ApiKeyLogEntity {
   constructor(apiKeyId: string, agent: string) {
     this.apiKeyId = apiKeyId
     this.agent = agent
+  }
+
+  @BeforeInsert()
+  beforeInsert() {
+    if (AuthenticationModule.config.debug)
+      Logger.debug(
+        `ApiKeyLogEntity::beforeInsert.apiKeyId: ${this.apiKeyId} agent: ${this.agent} ipAddress: ${this.ipAddress} eventCode: ${this.eventCode} eventMessage: ${this.eventMessage} createdAt: ${this.createdAt} apiKey: ${this.apiKey}`,
+      )
   }
 }

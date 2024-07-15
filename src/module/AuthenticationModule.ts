@@ -17,6 +17,7 @@ import { ApiKeyService } from '../services/ApiKeyService'
 import { AuthenticationAPIGuard } from '../decorators/APIGuard'
 import { ApiKeyEntity } from '../entities/ApiKeyEntity'
 import { ApiKeyLogEntity } from '../entities/ApiKeyLogEntity'
+import { Logger } from '@duaneoli/logger'
 
 @Global()
 @Module({})
@@ -42,7 +43,8 @@ export class AuthenticationModule {
       name: AuthorizationLibDefaultOwner,
     })
 
-    if (!config.appName) config.appName = 'OM-AUTHENTICATION-LIB'
+    if (!this.config.appName) this.config.appName = 'OM-AUTHENTICATION-LIB'
+    if (this.config.debug) Logger.debug('AuthenticationModule Inicialized') 
 
     return {
       global: true,

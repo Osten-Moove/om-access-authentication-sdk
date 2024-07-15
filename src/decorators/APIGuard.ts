@@ -39,6 +39,7 @@ export class AuthenticationAPIGuard implements CanActivate {
         
     ) {
         this.repository = AuthenticationModule.connection.getRepository(ApiKeyEntity)
+        if (AuthenticationModule.config.debug) console.log(`AuthenticationAPIGuard::constructor.repository: ${this.repository}`)
     }
 
     async canActivate<T>(context: ExecutionContext): Promise<boolean> {
@@ -46,7 +47,7 @@ export class AuthenticationAPIGuard implements CanActivate {
             context.getHandler(),
             context.getClass(),
     ])
-
+        if (AuthenticationModule.config.debug) console.log(`AuthenticationAPIGuard::canActivate.params: ${params}`)
         if (!params) return true
 
         try {
