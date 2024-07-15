@@ -1,18 +1,28 @@
+import { before } from 'node:test'
 import { randomUUID } from 'node:crypto'
-import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import {
+  BeforeInsert,
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
+import { AuthenticationModule } from '../module/AuthenticationModule'
+import { Logger } from '@duaneoli/logger'
 
 @Entity({ name: 'api_keys' })
 export class ApiKeyEntity<T extends string = string> {
-
   @PrimaryGeneratedColumn('uuid')
   id: string
 
-  @Column({ type: 'character varying',  length: 40 ,name: 'public_key', nullable: true })
+  @Column({ type: 'character varying', length: 40, name: 'public_key', nullable: true })
   publicKey: string
 
-  @Column({ type: 'character varying', name: 'secret_key', unique: true , length: 255})
+  @Column({ type: 'character varying', name: 'secret_key', unique: true, length: 255 })
   secretKey: string
-  
+
   @Column({ type: 'boolean', name: 'is_active', default: true })
   isActive: boolean
 
@@ -28,19 +38,12 @@ export class ApiKeyEntity<T extends string = string> {
   @UpdateDateColumn({ type: 'timestamp without time zone', default: () => 'CURRENT_TIMESTAMP', name: 'updated_at' })
   updatedAt: string
 
-  
-  constructor(entity?: {
-    isActive?: boolean
-    alias?: string
-    roles?: Array<T>
-    apiKey?: string;
-
-  }) {
+  constructor(entity?: { isActive?: boolean; alias?: string; roles?: Array<T>; apiKey?: string }) {
     if (!entity) return
     if (entity.alias) this.alias = entity.alias
     if (entity.isActive) this.isActive = entity.isActive
     if (entity.roles) this.roles = entity.roles
-      
+
     this.id = randomUUID()
   }
 }

@@ -8,6 +8,7 @@ import { ErrorCode } from '../helpers/ErrorCode'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { CreateLogins, UpdateLogins } from '../types/LoginTypes'
 import { LoginLogService } from './LoginLogService'
+import { Logger } from '@duaneoli/logger'
 
 @Injectable()
 export class LoginService {
@@ -15,9 +16,11 @@ export class LoginService {
 
   constructor(@Inject(LoginLogService) private readonly loginLogService: LoginLogService) {
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::constructor.repository: ${this.repository}`)
   }
 
   async create(data: CreateLogins): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::create.data: ${data}`)
     const logins = data.map((it) => it.login)
     const loginInDatabase = await this.repository.find({ where: { login: In(logins) } })
     if (loginInDatabase.length > 0) return [null, ErrorCode.LOGIN_ALREADY_USED]
@@ -28,6 +31,7 @@ export class LoginService {
   }
 
   async update(data: UpdateLogins): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::update.data: ${data}`)
     const loginIds = data.map((it) => it.id)
     const loginsToUpdate = await this.repository.find({ where: { id: In(loginIds) } })
 
@@ -43,6 +47,7 @@ export class LoginService {
   }
 
   async remove(loginIds: Array<string>): Promise<[Array<LoginEntity>, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::remove.loginIds: ${loginIds}`)
     const logins = await this.repository.find({ where: { id: In(loginIds) } })
     if (logins.length !== loginIds.length) return [null, ErrorCode.LOGIN_NOT_FOUND]
 
@@ -51,6 +56,7 @@ export class LoginService {
   }
 
   async definedPassword(loginId: string, password: string) {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::definedPassword.loginId: ${loginId}`)
     const loginEntity = await this.repository.findOne({ where: { id: loginId } })
     if (!loginEntity) throw new Error('Login entity not found')
 
@@ -62,6 +68,7 @@ export class LoginService {
   }
 
   async changePassword(loginId: string, password: string, options: { agent: string; ipAddress: string }) {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::changePassword.loginId: ${loginId}, options: ${options}`)
     const loginEntity = await this.repository.findOne({ where: { id: loginId } })
     if (!loginEntity) throw new Error('Login entity not found')
 
@@ -79,6 +86,7 @@ export class LoginService {
   }
 
   async invalidateToken(loginId: string) {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::invalidateToken.loginId: ${loginId}`)
     const loginEntity = await this.repository.findOne({ where: { id: loginId } })
     if (!loginEntity) throw new Error('Login entity not found')
 
@@ -87,10 +95,12 @@ export class LoginService {
   }
 
   async findOne(options: FindOneOptions<LoginEntity>) {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::findOne.options: ${options}`)
     return this.repository.findOne(options)
   }
 
   async find(options: FindManyOptions<LoginEntity>) {
+    if(AuthenticationModule.config.debug) Logger.debug(`LoginService::find.options: ${options}`)
     return this.repository.find(options)
   }
 }

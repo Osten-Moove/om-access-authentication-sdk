@@ -4,6 +4,7 @@ import { LoginEntity } from '../entities'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { ErrorCode } from '../helpers/ErrorCode'
 import { TupleResult } from '../types'
+import { Logger } from '@duaneoli/logger'
 
 export type SecretAndKeyUri = {
   secret: string
@@ -15,6 +16,7 @@ export class OtpService {
 
   constructor() {
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
+    if(AuthenticationModule.config.debug) Logger.debug(`OtpService::constructor.repository: ${this.repository}`)
   }
 
   /**
@@ -23,6 +25,7 @@ export class OtpService {
    * @returns Tuple with [{secret: string, keyUri: string}, error code]
    */
   async createOTP(loginId: string): Promise<TupleResult<SecretAndKeyUri, ErrorCode>> {
+    if(AuthenticationModule.config.debug) Logger.debug(`OtpService::createOTP.loginId: ${loginId}`)
     const login = await this.repository.findOne({ where: { id: loginId } })
     if (!login) return [null, ErrorCode.LOGIN_NOT_FOUND]
 
@@ -44,6 +47,7 @@ export class OtpService {
    * @returns Tuple with [{secret: string, keyUri: string}, error code]
    */
   async updateOTP(loginId: string, token: string): Promise<TupleResult<SecretAndKeyUri, ErrorCode>> {
+    if(AuthenticationModule.config.debug) Logger.debug(`OtpService::updateOTP.loginId: ${loginId}`)
     const login = await this.repository.findOne({ where: { id: loginId } })
     if (!login) return [null, ErrorCode.LOGIN_NOT_FOUND]
 
@@ -66,6 +70,7 @@ export class OtpService {
    * @returns Tupple with [boolean result, error code]
    */
   async validateOTP(loginId: string, token: string): Promise<TupleResult<boolean, ErrorCode>> {
+    if(AuthenticationModule.config.debug) Logger.debug(`OtpService::validateOTP.loginId: ${loginId}`)
     const login = await this.repository.findOne({ where: { id: loginId } })
     if (!login) [null, ErrorCode.LOGIN_NOT_FOUND]
 
@@ -81,6 +86,7 @@ export class OtpService {
    * @returns Tuple with [true, error code]
    */
   async removeOTP(loginId: string, token: string): Promise<TupleResult<true, ErrorCode>> {
+    if(AuthenticationModule.config.debug) Logger.debug(`OtpService::removeOTP.loginId: ${loginId}`)
     const login = await this.repository.findOne({ where: { id: loginId } })
     if (!login) [null, ErrorCode.LOGIN_NOT_FOUND]
 

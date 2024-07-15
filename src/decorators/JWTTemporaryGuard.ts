@@ -36,9 +36,11 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
   ) {
     this.secondarySecret = AuthenticationModule.config.secondarySecret
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
+    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTTemporaryGuard::constructor.repository: ${this.repository}`)
   }
 
   private async validateOtpToken(loginId: string, otp: string) {
+    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTTemporaryGuard::validateOtpToken.loginId: ${loginId}, otp: ${otp}`)
     const [tokenIsValid] = await this.otpService.validateOTP(loginId, otp)
     if (!tokenIsValid) throw Error('Invalid otp pin')
 
@@ -46,6 +48,7 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
   }
 
   private async validateEmailToken(pin: string, plainPin: string) {
+    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTTemporaryGuard::validateEmailToken.pin: ${pin}, plainPin: ${plainPin}`)
     const pinIsValid = this.authService.validatePin(pin, plainPin)
     if (!pinIsValid) throw Error('Invalid email pin')
 
@@ -53,6 +56,7 @@ export class AuthenticationJWTTemporaryGuard implements CanActivate {
   }
 
   async canActivate<T>(context: ExecutionContext): Promise<boolean> {
+    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTTemporaryGuard::canActivate.context: ${context}`)
     const params = this.reflector.getAllAndOverride<{ step: string; requiredPin: RequiredPin }>(metadataKey, [
       context.getHandler(),
       context.getClass(),

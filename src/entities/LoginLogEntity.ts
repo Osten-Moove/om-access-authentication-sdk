@@ -1,5 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
 import { LoginEntity } from './LoginEntity'
+import { before } from 'node:test'
+import { AuthenticationModule } from '../module/AuthenticationModule'
+import { Logger } from '@nestjs/common'
 
 @Entity({ name: 'login_logs' })
 export class LoginLogEntity {
@@ -31,5 +34,13 @@ export class LoginLogEntity {
   constructor(loginId: string, agent: string) {
     this.loginId = loginId
     this.agent = agent
+  }
+
+  @BeforeInsert()
+  beforeInsert() {
+    if (AuthenticationModule.config.debug)
+      Logger.debug(
+        `LoginLogEntity::beforeInsert.loginId: ${this.loginId} agent: ${this.agent} ipAddress: ${this.ipAddress} eventCode: ${this.eventCode} eventMessage: ${this.eventMessage} createdAt: ${this.createdAt} login: ${this.login}`,
+      )
   }
 }
