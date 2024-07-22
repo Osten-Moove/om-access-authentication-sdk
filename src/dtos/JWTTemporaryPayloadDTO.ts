@@ -2,8 +2,8 @@ export class JWTTemporaryPayloadDTO<T extends Record<string, any> | null = null 
   id: string
   type: string
   pin?: string
-  validationToken: string
-  passwordToken: string
+  validationToken?: string
+  passwordToken?: string
   moreInfo?: T
 
 

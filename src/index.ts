@@ -1,5 +1,6 @@
 export { JWTGuard } from './decorators/JWTGuard'
 export { JWTTemporaryGuard } from './decorators/JWTTemporaryGuard'
+export {JWTDynamic} from './decorators/JWTDynamic'
 export * from './entities'
 export { AuthenticationDataSource } from './helpers/DataSource'
 export { ErrorCode } from './helpers/ErrorCode'

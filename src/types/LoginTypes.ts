@@ -1,4 +1,5 @@
 import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
+import { JWTDynamicPayloadDTO } from '../dtos/JWTDynamicPayloadDTO'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
 
@@ -34,6 +35,7 @@ export type RequestAuthorization<R = null,T extends string = string> = {
   processedPayloadDTO?: JWTPayloadDTO<R>
   processedApiPayloadDTO?:JWTApiPayloadDTO
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
+  processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
 
   headers: {
     'x-temporary-authorization'?: string
