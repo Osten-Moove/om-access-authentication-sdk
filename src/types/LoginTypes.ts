@@ -33,7 +33,7 @@ export type GenerateJwtWithPinOptions = {
 
 export type RequestAuthorization<R = null,T extends string = string> = {
   processedPayloadDTO?: JWTPayloadDTO<R>
-  processedApiPayloadDTO?:JWTApiPayloadDTO
+  processedApiPayloadDTO?:JWTApiPayloadDTO<R>
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
   processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
 

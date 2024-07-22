@@ -29,6 +29,7 @@ export class AuthenticationJWTGuard implements CanActivate {
   constructor(private reflector: Reflector, @Inject(JwtService) private readonly jwtService: JwtService) {
     this.secret = AuthenticationModule.config.secret
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
+    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTGuard::constructor.repository: ${this.repository}`)
   }
 
   async canActivate<T>(context: ExecutionContext): Promise<boolean> {
@@ -36,7 +37,7 @@ export class AuthenticationJWTGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ])
-
+    if (AuthenticationModule.config.debug) console.log(`AuthenticationJWTGuard::canActivate.params: ${params}`)
     if (!params) return true
 
     try {

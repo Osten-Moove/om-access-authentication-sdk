@@ -8,6 +8,7 @@ import { ApiKeyOptionsRequest, GenerateApiKeyRequest } from '../types/ApiKeyType
 import { ApiKeyLogEvents } from '../types/ApiKeyLogTypes'
 import { CryptonSecurity } from '../helpers/Crypton'
 import { randomUUID } from 'node:crypto'
+import { Logger } from '@duaneoli/logger'
 
 
 @Injectable()
@@ -17,10 +18,11 @@ export class ApiKeyService {
   constructor(@Inject(ApiKeyLogService) private readonly apiKeyLogService: ApiKeyLogService,
 ) {
     this.repository = AuthenticationModule.connection.getRepository(ApiKeyEntity)
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::constructor.repository: ${this.repository}`)
   }
 
   async generate(data: GenerateApiKeyRequest, options?: ApiKeyOptionsRequest): Promise< ApiKeyEntity | [ApiKeyEntity, ErrorCode]> {
-    
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::generate.data: ${data}`)
     const newSecretKey = CryptonSecurity.generateRandom()
 
     const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
@@ -46,6 +48,7 @@ export class ApiKeyService {
   }
 
   async regenerate(apiKeyId: string, options?: ApiKeyOptionsRequest ): Promise< ApiKeyEntity | [ApiKeyEntity, ErrorCode]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::regenerate.apiKeyId: ${apiKeyId}`)
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
    
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
@@ -71,6 +74,7 @@ export class ApiKeyService {
   }
 
   async activate(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::activate.apiKeyId: ${apiKeyId}`)
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
@@ -91,6 +95,7 @@ export class ApiKeyService {
   }
 
   async deactivate(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::deactivate.apiKeyId: ${apiKeyId}`)
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
@@ -114,6 +119,7 @@ export class ApiKeyService {
   }
 
   async revoke(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::revoke.apiKeyId: ${apiKeyId}`)
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
@@ -132,7 +138,7 @@ export class ApiKeyService {
   }
 
   async validate(publicKey?: string, secretKey?: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {
-   
+    if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyService::validate.publicKey: ${publicKey}, secretKey: ${secretKey}`)
     if(!publicKey && !secretKey) return [null,
         ErrorCode.PUBLIC_KEY_AND_SECRET_KEY_NOT_GIVEN]
 
