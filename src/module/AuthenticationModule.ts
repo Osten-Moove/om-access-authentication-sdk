@@ -17,6 +17,7 @@ import { ApiKeyService } from '../services/ApiKeyService'
 import { AuthenticationAPIGuard } from '../decorators/APIGuard'
 import { ApiKeyEntity } from '../entities/ApiKeyEntity'
 import { ApiKeyLogEntity } from '../entities/ApiKeyLogEntity'
+import { AuthenticationJWTDynamicGuard } from '../decorators/JWTDynamicGuard'
 import { Logger } from '@duaneoli/logger'
 
 @Global()
@@ -33,7 +34,8 @@ export class AuthenticationModule {
 
     const jwtGuard = { provide: APP_GUARD, useClass: AuthenticationJWTGuard }
     const jwtTemporaryGuard = { provide: APP_GUARD, useClass: AuthenticationJWTTemporaryGuard }
-    const providers = [...services, jwtGuard, jwtTemporaryGuard, apiKeyGuard]
+    const jwtDynamicGuard = { provide: APP_GUARD, useClass: AuthenticationJWTDynamicGuard }
+    const providers = [...services, jwtGuard, jwtTemporaryGuard, apiKeyGuard, jwtDynamicGuard]
     const imports = [JwtModule.register({ secret: this.config.secret })]
     const exports = [...services, JwtModule]
 
