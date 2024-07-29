@@ -80,15 +80,7 @@ export class ApiKeyService {
 
     apiKey.isActive = true
 
-    const newSecretKey = CryptonSecurity.generateRandom()
-
-    const cryptSecretKey =  CryptonSecurity.encrypt(newSecretKey, process.env.API_GUARD)
-
-
-    const entitySaved = await this.repository.save({
-      ...apiKey,
-      secretKey: cryptSecretKey
-    })
+    const entitySaved = await this.repository.save(apiKey)
 
     const { API_KEY_ACTIVATED } = ApiKeyLogEvents
 
@@ -99,7 +91,7 @@ export class ApiKeyService {
         ...options
     })
 
-    return [{...entitySaved, secretKey: newSecretKey }, null]
+    return [entitySaved, null]
   }
 
   async deactivate(apiKeyId: string, options?: ApiKeyOptionsRequest): Promise<[ApiKeyEntity, ErrorCode | undefined]> {

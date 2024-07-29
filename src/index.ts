@@ -1,6 +1,6 @@
 export { JWTGuard } from './decorators/JWTGuard'
 export { JWTTemporaryGuard } from './decorators/JWTTemporaryGuard'
-export * from './entities'
+export {JWTDynamicGuard} from './decorators/JWTDynamicGuard'
 export { AuthenticationDataSource } from './helpers/DataSource'
 export { ErrorCode } from './helpers/ErrorCode'
 export { AuthenticationModule } from './module/AuthenticationModule'
@@ -14,4 +14,5 @@ export { APIGuard } from './decorators/APIGuard'
 export { ApiKeyEntity } from './entities/ApiKeyEntity'
 export { ApiKeyLogEntity } from './entities/ApiKeyLogEntity'
 
+export * from './entities'
 export * from './types'

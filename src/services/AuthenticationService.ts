@@ -10,6 +10,7 @@ import { generateNumberString } from '../helpers/GeneratePin'
 import { AuthenticationModule } from '../module/AuthenticationModule'
 import { GenerateJwtWithPinOptions } from '../types/LoginTypes'
 import { LoginLogService } from './LoginLogService'
+import { JWTDynamicPayloadDTO } from '../dtos/JWTDynamicPayloadDTO'
 import { Logger } from '@duaneoli/logger'
 
 @Injectable()
@@ -44,6 +45,21 @@ export class AuthenticationService {
     const p = JWTTemporaryPayloadDTO.createPayload(payload)
     const options: JwtSignOptions = { expiresIn, secret: AuthenticationModule.config.secondarySecret }
     return this.jwtService.sign(p, options)
+  }
+
+  async generateDynamicJWT<T>(type: string, options?: GenerateJwtWithPinOptions, moreInfo?: T) {
+    const _options: GenerateJwtWithPinOptions = Object.assign(
+      { pinLength: 6, expiresIn: '10m' } as GenerateJwtWithPinOptions,
+      options,
+    ) 
+    
+    const pin = generateNumberString(_options.pinLength)
+    const pinHash = bcrypt.hashSync(pin, 10)
+    const payload: Partial<JWTDynamicPayloadDTO<T >> = {  type, pin: pinHash,  ...moreInfo}
+
+    const token = this.generateSecondaryJWT<T>(payload, _options.expiresIn)
+
+    return { token, pin }
   }
 
   async generateTemporaryJWT<T>(id: string, type: string, options?: GenerateJwtWithPinOptions, moreInfo?: T) {
