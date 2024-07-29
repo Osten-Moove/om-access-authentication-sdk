@@ -1,5 +1,4 @@
 import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
-import { JWTDynamicPayloadDTO } from '../dtos/JWTDynamicPayloadDTO'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
 
@@ -31,19 +30,20 @@ export type GenerateJwtWithPinOptions = {
   expiresIn?: string
 }
 
-export type RequestAuthorization<R = null,T extends string = string> = {
+export type RequestAuthorization<R = null, T extends string = string> = {
   processedPayloadDTO?: JWTPayloadDTO<R>
-  processedApiPayloadDTO?:JWTApiPayloadDTO<R>
+  processedApiPayloadDTO?: JWTApiPayloadDTO<R>
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
-  processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
 
   headers: {
     'x-temporary-authorization'?: string
     'x-email-pin'?: string
     'x-otp-pin'?: string
     'x-user-type'?: T
+    'x-portal-type'?: T
   }
   userType?: T
+  portalType?: T
 }
 
 export const enum RequiredPin {

@@ -29,7 +29,8 @@ export class AuthenticationJWTGuard implements CanActivate {
   constructor(private reflector: Reflector, @Inject(JwtService) private readonly jwtService: JwtService) {
     this.secret = AuthenticationModule.config.secret
     this.repository = AuthenticationModule.connection.getRepository(LoginEntity)
-    if(AuthenticationModule.config.debug) console.log(`AuthenticationJWTGuard::constructor.repository: ${this.repository}`)
+    if (AuthenticationModule.config.debug)
+      console.log(`AuthenticationJWTGuard::constructor.repository: ${this.repository}`)
   }
 
   async canActivate<T>(context: ExecutionContext): Promise<boolean> {
@@ -41,7 +42,7 @@ export class AuthenticationJWTGuard implements CanActivate {
     if (!params) return true
 
     try {
-      const request: RequestAuthorization<T> & { headers: any; processedHeaderDTO: any} = context
+      const request: RequestAuthorization<T> & { headers: any; processedHeaderDTO: any } = context
         .switchToHttp()
         .getRequest()
 
@@ -49,6 +50,7 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (!request.headers['authorization']) throw Error('No authorization header given')
       const [bearer, token] = request.headers['authorization'].split(' ')
       request.userType = request.headers['x-user-type']
+      request.portalType = request.headers['x-portal-type']
       if (request.userType && params.roles && !params.roles.includes(request.userType))
         throw Error('User type not authorized for operation')
       if (bearer !== 'Bearer') throw Error('Invalid bearer token')
@@ -73,7 +75,11 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (loginEntity.validationToken !== request.processedPayloadDTO.validationToken)
         throw Error('Invalid validation token')
       if (loginEntity.passwordToken !== request.processedPayloadDTO.passwordToken) throw Error('Invalid password token')
-      if (params.roles && params.roles.length > 0 && !loginEntity.roles.some((it) => params.roles.includes(it)))
+      if (
+        request.headers['x-user-type'] &&
+        request.headers['x-user-type'].length > 0 &&
+        !loginEntity.roles.includes(request.headers['x-user-type'])
+      )
         throw Error('User not have role for action')
       return true
     } catch (error) {
