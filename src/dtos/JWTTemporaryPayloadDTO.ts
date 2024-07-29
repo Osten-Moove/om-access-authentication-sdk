@@ -23,8 +23,8 @@ export class JWTTemporaryPayloadDTO<T extends Record<string, any> | null = null 
   static matchesObject<R>(data?: Partial<JWTTemporaryPayloadDTO<R>>): boolean {
     if (!data) return false
     const keys = Object.keys(data)
-    const requiredKeys = ['id', 'step']
-    if (!keys.some((it) => requiredKeys.includes(it))) return false
+    const requiredKeys = ['id', 'type']
+    if (keys.some((it) => !requiredKeys.includes(it))) return false
     return true
   }
 }

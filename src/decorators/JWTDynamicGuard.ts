@@ -62,18 +62,9 @@ export class AuthenticationJWTDynamicGuard implements CanActivate {
       if (!bearerTokenProcessor.isSignatureValid(this.secondarySecret)) throw Error('JWT signature error')
       if (params.step !== bearerTokenProcessor.payload?.type) throw Error('Invalid step')
 
-      request.processedDynamicPayloadDTO = bearerTokenProcessor.payload
       
-      if (request.processedPayloadDTO && request.processedPayloadDTO.id !== request.processedDynamicPayloadDTO.id)
-        throw Error('User id not math in authorized payload')
-
-      if (request.processedHeaderDTO) {
-        request.processedHeaderDTO.userId = bearerTokenProcessor.payload?.id
-        request.processedHeaderDTO.expirationTime = bearerTokenProcessor.expirationTime
-      }
-
+ 
       const pin = request.headers['x-email-pin']
-      const otp = request.headers['x-otp-pin']
 
       switch (params.requiredPin) {
         case RequiredPin.ONLY_EMAIL:
@@ -81,7 +72,7 @@ export class AuthenticationJWTDynamicGuard implements CanActivate {
           await this.validateEmailToken(request.processedDynamicPayloadDTO.pin, pin)
           break
         case RequiredPin.ANY:
-          if (!pin && !otp) throw Error('No pin specified')
+          if (!pin ) throw Error('No pin specified')
           if (pin) await this.validateEmailToken(request.processedDynamicPayloadDTO.pin, pin)
           break
         default:
