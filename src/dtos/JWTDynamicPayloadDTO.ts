@@ -17,9 +17,9 @@ export class JWTDynamicPayloadDTO<T extends Record<string, any> | null = null > 
   static matchesObject<R>(data?: Partial<JWTDynamicPayloadDTO<R>>): boolean {
     if (!data) return false
     const keys = Object.keys(data)
-    const requiredKeys = ['id', 'type']
+    const requiredKeys = ['type']
     if (keys.some((it) => !requiredKeys.includes(it))) return false
     return true
   }
-  
+
 }
