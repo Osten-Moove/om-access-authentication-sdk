@@ -52,11 +52,10 @@ export class AuthenticationService {
       { pinLength: 6, expiresIn: '10m' } as GenerateJwtWithPinOptions,
       options,
     ) 
-    
     const pin = generateNumberString(_options.pinLength)
     const pinHash = bcrypt.hashSync(pin, 10)
-    const payload: Partial<JWTDynamicPayloadDTO<T >> = {  type, pin: pinHash,  ...moreInfo}
 
+    const payload: Partial<JWTDynamicPayloadDTO<T >> = {  type, pin: pinHash,  moreInfo}
     const token = this.generateSecondaryJWT<T>(payload, _options.expiresIn)
 
     return { token, pin }
