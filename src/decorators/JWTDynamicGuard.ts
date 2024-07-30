@@ -63,7 +63,8 @@ export class AuthenticationJWTDynamicGuard implements CanActivate {
       if (params.step !== bearerTokenProcessor.payload?.type) throw Error('Invalid step')
 
       
- 
+      request.processedDynamicPayloadDTO = bearerTokenProcessor.payload
+
       const pin = request.headers['x-email-pin']
 
       switch (params.requiredPin) {
@@ -78,7 +79,7 @@ export class AuthenticationJWTDynamicGuard implements CanActivate {
         default:
           break
       }
-
+      
       return true
     } catch (error) {
       throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })
