@@ -56,7 +56,6 @@ export class AuthenticationService {
     const pinHash = bcrypt.hashSync(pin, 10)
 
     const payload: Partial<JWTDynamicPayloadDTO<T >> = {  type, pin: pinHash,  moreInfo}
-    console.log('payload', payload)
     const token = this.generateSecondaryJWT<T>(payload, _options.expiresIn)
 
     return { token, pin }
