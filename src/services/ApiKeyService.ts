@@ -123,16 +123,11 @@ export class ApiKeyService {
     const apiKey = await this.repository.findOne({ where: { id: apiKeyId } })
     if (!apiKey) return [null, ErrorCode.API_KEY_NOT_FOUND]
 
+    await this.apiKeyLogService.deleteLogsByApiKeyId(apiKeyId);
     const removedEntity = await this.repository.remove(apiKey)
 
-    const { API_KEY_REVOKED } = ApiKeyLogEvents
 
-    this.apiKeyLogService.register({
-        eventCode: API_KEY_REVOKED.code,
-        eventMessage: API_KEY_REVOKED.message,
-        apiKeyId,
-        ...options
-    })
+ 
 
     return [removedEntity, null]
   }

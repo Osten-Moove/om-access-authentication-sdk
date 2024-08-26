@@ -28,4 +28,8 @@ export class ApiKeyLogService {
     if(AuthenticationModule.config.debug) Logger.debug(`ApiKeyLogService::findAndCount.options: ${options}`)
     return this.repository.findAndCount(options)
   }
+
+  async deleteLogsByApiKeyId(apiKeyId: string): Promise<void> {
+    await this.repository.delete({ apiKeyId });
+} 
 }
