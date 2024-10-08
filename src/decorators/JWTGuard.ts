@@ -76,7 +76,7 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (params.roles && params.roles.length > 0 && !loginEntity.roles.some((it) => params.roles.includes(it)))
         throw Error('User not have role for action')
       return true
-    } catch (error) 
+    } catch (error) {
       throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })
     }
   }
