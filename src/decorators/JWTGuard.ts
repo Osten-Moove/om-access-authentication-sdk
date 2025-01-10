@@ -75,6 +75,8 @@ export class AuthenticationJWTGuard implements CanActivate {
       if (loginEntity.passwordToken !== request.processedPayloadDTO.passwordToken) throw Error('Invalid password token')
       if (params.roles && params.roles.length > 0 && !loginEntity.roles.some((it) => params.roles.includes(it)))
         throw Error('User not have role for action')
+
+      request.login = loginEntity
       return true
     } catch (error) {
       throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })

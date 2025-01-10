@@ -2,6 +2,7 @@ import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
 import { JWTDynamicPayloadDTO } from '../dtos/JWTDynamicPayloadDTO'
 import { JWTPayloadDTO } from '../dtos/JWTPayloadDTO'
 import { JWTTemporaryPayloadDTO } from '../dtos/JWTTemporaryPayloadDTO'
+import { LoginEntity } from '../entities'
 
 export type CreateLogin = {
   id?: string
@@ -36,7 +37,7 @@ export type RequestAuthorization<R = null,T extends string = string> = {
   processedApiPayloadDTO?:JWTApiPayloadDTO<R>
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
   processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
-
+  login: LoginEntity
   headers: {
     'x-temporary-authorization'?: string
     'x-email-pin'?: string
