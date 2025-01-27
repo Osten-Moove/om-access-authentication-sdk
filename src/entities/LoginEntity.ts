@@ -8,7 +8,7 @@ export class LoginEntity<T extends string = string> {
   @PrimaryColumn('uuid')
   id: string
 
-  @Column({ type: 'character varying', length: 50, unique: true })
+  @Column({ type: 'character varying', length: 255, unique: true })
   login: string
 
   @Column('character varying')
