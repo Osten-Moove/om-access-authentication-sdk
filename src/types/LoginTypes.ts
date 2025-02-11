@@ -37,7 +37,7 @@ export type RequestAuthorization<R = null,T extends string = string> = {
   processedApiPayloadDTO?:JWTApiPayloadDTO<R>
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
   processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
-  login: LoginEntity
+  login: LoginEntity<T>
   headers: {
     'x-temporary-authorization'?: string
     'x-email-pin'?: string
@@ -45,6 +45,8 @@ export type RequestAuthorization<R = null,T extends string = string> = {
     'x-user-type'?: T
   }
   userType?: T
+  roles: Array<T>
+  role: T
 }
 
 export const enum RequiredPin {
