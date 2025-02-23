@@ -1,27 +1,27 @@
 import {
-  CanActivate,
-  ExecutionContext,
-  HttpException,
-  HttpStatus,
-  Inject,
-  Injectable,
-  SetMetadata,
+    CanActivate,
+    ExecutionContext,
+    HttpException,
+    HttpStatus,
+    Inject,
+    Injectable,
+    SetMetadata,
 } from '@nestjs/common'
 import { Reflector } from '@nestjs/core'
-import { AuthorizationLibDefaultOwner } from '../helpers/AuthorizationLibVariables'
-import { RequestAuthorization } from '../types/LoginTypes'
-import { ErrorCode } from '../helpers/ErrorCode'
-import { ApiKeyService } from '../services/ApiKeyService'
 import { JwtService } from '@nestjs/jwt'
-import { BearerTokenProcessor } from '../helpers/BearerTokenProcessor'
-import { Repository } from 'typeorm'
-import { ApiKeyEntity } from '../entities/ApiKeyEntity'
-import { AuthenticationModule } from '../module/AuthenticationModule'
-import { CryptonSecurity } from '../helpers/Crypton'
-import { ApiKeyLogEvents } from '../types/ApiKeyLogTypes'
-import { ApiKeyLogService } from '../services/ApiKeyLogService'
 import { warn } from 'console'
+import { Repository } from 'typeorm'
 import { JWTApiPayloadDTO } from '../dtos/JWTApiPayloadDTO'
+import { ApiKeyEntity } from '../entities/ApiKeyEntity'
+import { AuthorizationLibDefaultOwner } from '../helpers/AuthorizationLibVariables'
+import { BearerTokenProcessor } from '../helpers/BearerTokenProcessor'
+import { CryptonSecurity } from '../helpers/Crypton'
+import { ErrorCode } from '../helpers/ErrorCode'
+import { AuthenticationModule } from '../module/AuthenticationModule'
+import { ApiKeyLogService } from '../services/ApiKeyLogService'
+import { ApiKeyService } from '../services/ApiKeyService'
+import { ApiKeyLogEvents } from '../types/ApiKeyLogTypes'
+import { RequestAuthorization } from '../types/LoginTypes'
 
 const metadataKey = AuthorizationLibDefaultOwner + 'API_KEY_GUARD'
 
@@ -107,7 +107,6 @@ export class AuthenticationAPIGuard implements CanActivate {
 
             return true
         } catch (error) {
-            console.log(error)
             throw new HttpException('Not authorized for perform action', HttpStatus.UNAUTHORIZED, { cause: error.message })
         }
     }
