@@ -6,8 +6,7 @@ import { JWTDynamicPayloadDTO } from '../dtos/JWTDynamicPayloadDTO'
 
 type JWT<R> = JWTPayloadDTO<R> | JWTTemporaryPayloadDTO<R> | JWTDynamicPayloadDTO<R>
 
-export class BearerTokenProcessor<R,T = JWT<R>> {
-
+export class BearerTokenProcessor<R, T = JWT<R>> {
   private jwtService: JwtService
   token: string = ''
   payload?: T
@@ -23,8 +22,8 @@ export class BearerTokenProcessor<R,T = JWT<R>> {
     return this.jwtService.decode(this.token) ? true : false
   }
 
-  isSignatureValid(secret?: string): boolean {
-    const bearerTokenProcessor = this.jwtService.verify(this.token, secret ? { secret } : undefined)
+  isSignatureValid(secret?: string, ignoreExpiration?: boolean): boolean {
+    const bearerTokenProcessor = this.jwtService.verify(this.token, { secret, ignoreExpiration })
     this.payload = bearerTokenProcessor.payload
     this.expirationTime = bearerTokenProcessor.exp
     this.creationTime = bearerTokenProcessor.jti
