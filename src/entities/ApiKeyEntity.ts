@@ -1,16 +1,5 @@
-import { before } from 'node:test'
 import { randomUUID } from 'node:crypto'
-import {
-  BeforeInsert,
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm'
-import { AuthenticationModule } from '../module/AuthenticationModule'
-import { Logger } from '@duaneoli/logger'
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
 
 @Entity({ name: 'api_keys' })
 export class ApiKeyEntity<T extends string = string> {

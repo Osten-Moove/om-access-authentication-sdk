@@ -1,9 +1,9 @@
+import { Logger } from '@duaneoli/logger'
 import * as bcrypt from 'bcrypt'
 import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
 import { AuthenticationModule } from '../module/AuthenticationModule'
-import { Logger } from '@duaneoli/logger'
 
-@Entity({ name: 'access' })
+@Entity({ name: 'login' })
 export class LoginEntity<T extends string = string> {
   @PrimaryColumn('uuid')
   id: string

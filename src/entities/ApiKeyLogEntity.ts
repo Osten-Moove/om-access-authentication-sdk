@@ -1,8 +1,7 @@
-import { before } from 'node:test';
+import { Logger } from '@duaneoli/logger'
 import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { AuthenticationModule } from '../module/AuthenticationModule'
 import { ApiKeyEntity } from './ApiKeyEntity'
-import { Logger } from '@duaneoli/logger';
-import { AuthenticationModule } from '../module/AuthenticationModule';
 
 @Entity({ name: 'api_key_logs' })
 export class ApiKeyLogEntity {
