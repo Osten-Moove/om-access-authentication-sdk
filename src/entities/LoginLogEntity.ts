@@ -1,8 +1,7 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
-import { LoginEntity } from './LoginEntity'
-import { before } from 'node:test'
-import { AuthenticationModule } from '../module/AuthenticationModule'
 import { Logger } from '@nestjs/common'
+import { BeforeInsert, Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import { AuthenticationModule } from '../module/AuthenticationModule'
+import { LoginEntity } from './LoginEntity'
 
 @Entity({ name: 'login_logs' })
 export class LoginLogEntity {
