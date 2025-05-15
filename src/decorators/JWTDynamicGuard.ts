@@ -19,7 +19,7 @@ import { RequestAuthorization, RequiredPin } from '../types/LoginTypes'
 const metadataKey = AuthorizationLibDefaultOwner + 'JWT_DYNAMIC_GUARD'
 
 export const JWTDynamicGuard = (step: string, requiredPin: RequiredPin = RequiredPin.ANY, ignoreExpiration?: boolean) =>
-  SetMetadata(metadataKey, { step, requiredPin })
+  SetMetadata(metadataKey, { step, requiredPin , ignoreExpiration})
 
 @Injectable()
 export class AuthenticationJWTDynamicGuard implements CanActivate {
@@ -55,6 +55,8 @@ export class AuthenticationJWTDynamicGuard implements CanActivate {
       if (!request.headers['x-dynamic-authorization']) throw Error('No authorization header given')
 
       const token = request.headers['x-dynamic-authorization']
+
+      if(!token) throw Error('Token not found')
 
       const bearerTokenProcessor = new BearerTokenProcessor<T, JWTDynamicPayloadDTO<T>>(this.jwtService, token)
 
