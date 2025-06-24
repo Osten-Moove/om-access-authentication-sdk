@@ -1,15 +1,19 @@
-import * as bcrypt from 'bcrypt'
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm'
-import { AuthenticationModule } from '../module/AuthenticationModule'
 import { Logger } from '@duaneoli/logger'
+import * as bcrypt from 'bcrypt'
+import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryColumn, Unique, UpdateDateColumn } from 'typeorm'
+import { AuthenticationModule } from '../module/AuthenticationModule'
 
 @Entity({ name: 'access' })
+@Unique(['login', 'tenantId'])
 export class LoginEntity<T extends string = string> {
   @PrimaryColumn('uuid')
   id: string
 
   @Column({ type: 'character varying', length: 255, unique: true })
   login: string
+
+  @Column({ name: 'tenant_id', type: 'uuid', nullable: true })
+  tenantId: string
 
   @Column('character varying')
   password: string
@@ -49,6 +53,7 @@ export class LoginEntity<T extends string = string> {
     email?: string
     fullName?: string
     roles?: Array<T>
+    tenantId?: string
   }) {
     if (!entity) return
     if (entity.id) this.id = entity.id
@@ -58,6 +63,7 @@ export class LoginEntity<T extends string = string> {
     if (entity.fullName) this.fullName = entity.fullName
     if (entity.roles) this.roles = entity.roles
     if (entity.password) this.password = bcrypt.hashSync(entity.password, 10)
+    if (entity.tenantId) this.tenantId = entity.tenantId
   }
 
   @BeforeInsert()

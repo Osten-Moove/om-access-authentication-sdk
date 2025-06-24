@@ -12,6 +12,7 @@ export type CreateLogin = {
   roles?: Array<string>
   email: string
   fullName: string
+  tenantId?: string
 }
 
 export type CreateLogins = Array<CreateLogin>
@@ -23,6 +24,7 @@ export type UpdateLogin = {
   roles?: Array<string>
   email?: string
   fullName?: string
+  tenantId?: string
 }
 
 export type UpdateLogins = Array<UpdateLogin>
@@ -32,9 +34,9 @@ export type GenerateJwtWithPinOptions = {
   expiresIn?: string
 }
 
-export type RequestAuthorization<R = null,T extends string = string> = {
+export type RequestAuthorization<R = null, T extends string = string> = {
   processedPayloadDTO?: JWTPayloadDTO<R>
-  processedApiPayloadDTO?:JWTApiPayloadDTO<R>
+  processedApiPayloadDTO?: JWTApiPayloadDTO<R>
   processedTemporaryPayloadDTO?: JWTTemporaryPayloadDTO<R>
   processedDynamicPayloadDTO?: JWTDynamicPayloadDTO<R>
   login: LoginEntity<T>
@@ -45,6 +47,7 @@ export type RequestAuthorization<R = null,T extends string = string> = {
     'x-user-type'?: T
   }
   userType?: T
+  tenantId?: string
   roles: Array<T>
   role: T
 }

@@ -109,11 +109,13 @@ export class AuthenticationService {
     password: string,
     options: { agent: string; ipAddress: string },
     role: string,
+    tenantId?: string,
   ): Promise<[LoginEntity, ErrorCode | undefined]> {
     try {
       if (AuthenticationModule.config.debug) Logger.debug('AuthenticationService::login started')
       const loginEntity = await this.repository.findOneBy({
         login,
+        tenantId,
       })
       if (AuthenticationModule.config.debug) Logger.debug(`loginEntity: ${loginEntity}`)
 
